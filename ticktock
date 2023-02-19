@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# This basically acts like value++ for a given key, but modulo
+
+if [ -z "$1" ]; then
+  echo "ticktock: increment a value in the kv store, and reset it for a given modulo"
+  echo "usage: ticktock <key> [modulo]"
+  exit 1
+fi
+
+value="$(kvstok getkv "$1")"
+modulo="$(kvstok getkv "$1-modulo")"
+if [ -z "$modulo" ]; then
+  modulo=2
+fi
+if [ -z "$value" ]; then
+  value=0
+fi
+echo "$value"
+
+# if the value + 1 is == modulo, then set to 0, otherwise set to value + 1
+
+if [ "$((value + 1))" -eq "$modulo" ]; then
+  kvstok setkv "$1" 0
+else
+  kvstok setkv "$1" "$((value + 1))"
+fi
+
+kvstok setkv "$1-modulo" "$modulo"
