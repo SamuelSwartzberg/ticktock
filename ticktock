@@ -8,22 +8,27 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-value="$(kvstok getkv "$1")"
-modulo="$(kvstok getkv "$1-modulo")"
+value="$(kvstok getkv "ticktock__$1")"
+modulo="$2"
 if [ -z "$modulo" ]; then
+  modulo="$(kvstok getkv "ticktock__$1-modulo")"
+fi
+if
+  [ -z "$modulo" ] || ! [ "$modulo" -eq "$modulo" ] 2>/dev/null
+then
   modulo=2
 fi
-if [ -z "$value" ]; then
+if [ -z "$value" ] || ! [ "$value" -eq "$value" ] 2>/dev/null; then
   value=0
 fi
-echo "$value"
+echo -n "$value"
 
 # if the value + 1 is == modulo, then set to 0, otherwise set to value + 1
 
 if [ "$((value + 1))" -eq "$modulo" ]; then
-  kvstok setkv "$1" 0
+  kvstok addkv "ticktock__$1" 0
 else
-  kvstok setkv "$1" "$((value + 1))"
+  kvstok addkv "ticktock__$1" "$((value + 1))"
 fi
 
-kvstok setkv "$1-modulo" "$modulo"
+kvstok addkv "ticktock__$1-modulo" "$modulo"
